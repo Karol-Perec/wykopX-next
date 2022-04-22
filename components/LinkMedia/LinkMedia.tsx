@@ -11,7 +11,7 @@ type ImageQuality = 'original' | 'hq' | 'mq' | 'lq';
 interface LinkMediaProps {
   type?: MediaType;
   sourceUrl: string;
-  imageUrl: string;
+  imageUrl?: string;
   linkTo: string;
   plus18: boolean;
   aspectRatio?: number;
@@ -41,7 +41,7 @@ const LinkMedia = ({
   const isWindow = useIsWindow();
   const mediaContainerRef = useRef<HTMLDivElement>(null);
   const isOnScreen = useIsOnScreen(mediaContainerRef);
-  const displayedImageUrl = getDisplayedImageUrl(imageUrl, 'hq');
+  const displayedImageUrl = imageUrl && getDisplayedImageUrl(imageUrl, 'hq');
   const isVideo = type === 'video' || ReactPlayer.canPlay(sourceUrl);
 
   const enlargeVideo = (event: MouseEvent) => {
