@@ -1,8 +1,28 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import type { AppProps } from 'next/app';
+import Layout from 'components/Layout/Layout';
+import { GlobalStyles } from '@mui/material';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import ThemeContextProvider from '../contexts/ThemeContextProvider';
+import ErrorBoundary from '../components/ErrorBoundary/ErrorBoundary';
+import { globalStyles } from 'styles/globalStyles';
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
-}
+const queryClient = new QueryClient();
 
-export default MyApp
+const MyApp = ({ Component, pageProps }: AppProps) => {
+  const xd = 'xd';
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeContextProvider>
+        <GlobalStyles styles={globalStyles} />
+        <Layout>
+          <ErrorBoundary>
+            <Component {...pageProps} />
+          </ErrorBoundary>
+        </Layout>
+      </ThemeContextProvider>
+    </QueryClientProvider>
+  );
+};
+
+export default MyApp;
