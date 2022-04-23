@@ -1,19 +1,18 @@
-export const xd = 'xd';
+import { useQuery } from 'react-query';
+import axios from 'axios';
+import { Link } from 'types/link.types';
 
-// import { useQuery } from 'react-query';
-// import { Link } from 'types/link.types';
-// import axios from 'utils/axios';
+const getLink = async (id: number) => {
+  const response = await axios.get<Link>(`/api/links/${id}`);
+  return response.data;
+};
 
-// const getLink = async (id: number) => {
-//   const response = await axios.get<Link>(`/links/${id}`);
-//   return response.data;
-// };
+const useLink = (id: number, initialData?: Link) =>
+  useQuery(['link', id], () => getLink(id), {
+    staleTime: 10000,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+    initialData,
+  });
 
-// const useLink = (id: number) =>
-//   useQuery(['link', id], () => getLink(id), {
-//     staleTime: 10000,
-//     keepPreviousData: true,
-//     refetchOnWindowFocus: false,
-//   });
-
-// export default useLink;
+export default useLink;

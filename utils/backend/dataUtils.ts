@@ -38,7 +38,7 @@ const mapUser = (p: WykopAuthor): User => ({
 const mapEntryComments = (comments: WykopEntryComment[]): EntryComment[] =>
   comments.map((c) => ({
     id: c.id,
-    body: c.body,
+    ...(c.body && { body: c.body }),
     date: c.date,
     voteCountPlus: c.vote_count,
     user: mapUser(c.author),

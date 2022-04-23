@@ -4,7 +4,7 @@ import ErrorMessage from 'components/UI/ErrorMessage';
 import LinksList from 'components/Links/LinksList/LinksList';
 import usePromotedLinks from '../hooks/api/usePromotedLinks';
 import { Link } from 'types';
-import { getLinks } from './api/links/[category]';
+import { getLinks } from './api/links';
 
 interface HomeProps {
   links?: Link[];

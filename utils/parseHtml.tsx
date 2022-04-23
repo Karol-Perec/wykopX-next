@@ -2,6 +2,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable react/no-array-index-key */
 import { Fragment } from 'react';
+import { parseDocument } from 'htmlparser2';
 import { ExternalNoPropagationLink, NoPropagationLink } from 'components/UI/CustomLinks';
 import Spoiler from 'components/UI/Spoiler';
 
@@ -28,9 +29,7 @@ const parseSpoilerText = (text: string | null) =>
     if (word.startsWith('@')) {
       return (
         <Fragment key={idx}>
-          <NoPropagationLink href={`/ludzie/${word.substring(1)}`}>
-            {word}
-          </NoPropagationLink>{' '}
+          <NoPropagationLink href={`/ludzie/${word.substring(1)}`}>{word}</NoPropagationLink>{' '}
         </Fragment>
       );
     }
@@ -111,8 +110,11 @@ const parseNodes = (nodes: NodeListOf<ChildNode>) =>
 export const parseHtml = (text: string) => {
   if (!text) return null;
 
-  const parser = new DOMParser();
-  const parsedText = parser.parseFromString(text, 'text/html');
-
-  return parseNodes(parsedText.body.childNodes);
+  if (typeof window !== 'undefined') {
+    const parser = new DOMParser();
+    const parsedText = parser.parseFromString(text, 'text/html');
+    return parseNodes(parsedText.body.childNodes);
+  }
+  const parsedText = parseDocument(text);
+  return parseNodes(parsedText.childNodes as any);
 };

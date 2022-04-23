@@ -3,6 +3,7 @@ import ReactPlayer from 'react-player';
 import useIsOnScreen from 'hooks/useIsOnScreen';
 import { getDisplayedImageUrl } from 'utils/imageUtils';
 import * as S from './Video.styles';
+import useIsWindow from '../../../hooks/useIsWindow';
 
 interface VideoProps {
   sourceUrl: string;
@@ -13,6 +14,7 @@ interface VideoProps {
 }
 
 const Video = ({ sourceUrl, imageUrl, plus18, aspectRatio, listMode }: VideoProps) => {
+  const isWindow = useIsWindow();
   const [expandedVideo, setExpandedVideo] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isOnScreen = useIsOnScreen(wrapperRef);
@@ -23,6 +25,8 @@ const Video = ({ sourceUrl, imageUrl, plus18, aspectRatio, listMode }: VideoProp
     event.stopPropagation();
     setExpandedVideo(true);
   };
+
+  if(!isWindow) return null;
 
   return (
     <S.Container>

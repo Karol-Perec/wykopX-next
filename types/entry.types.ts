@@ -6,7 +6,7 @@ export type EntriesSort = 'active' | 'hot' | 'favourite';
 export interface EntryComment {
   id: number;
   user: User;
-  body: string;
+  body?: string;
   date: string;
   voteCountPlus: number;
 }
