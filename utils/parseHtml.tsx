@@ -1,20 +1,12 @@
-/* eslint-disable max-len */
-/* eslint-disable no-use-before-define */
 /* eslint-disable react/no-array-index-key */
 import { Fragment } from 'react';
-import { parseDocument } from 'htmlparser2';
+import { DOMParser as NodeDOMParser } from '@xmldom/xmldom';
 import { ExternalNoPropagationLink, NoPropagationLink } from 'components/UI/CustomLinks';
 import Spoiler from 'components/UI/Spoiler';
 
 const encodeUtf8 = (message: string) => {
   const query = new URLSearchParams(message);
   return Array.from(query)?.[0].join(' ');
-};
-
-const parseTextNode = (text: string | null) => {
-  if (!text || text === '\\n') return null;
-  if (text.endsWith('#') || text.endsWith('@')) return text.slice(0, -1);
-  return text;
 };
 
 const parseSpoilerText = (text: string | null) =>
@@ -43,55 +35,49 @@ const parseSpoilerText = (text: string | null) =>
     return `${word} `;
   });
 
-const parseElementNode = (node: ChildNode) => {
-  switch (node.nodeName) {
-    case 'BR':
+const parseTextNode = (text: string | null) => {
+  if (!text || text === '\\n') return null;
+  if (text.endsWith('#') || text.endsWith('@')) return text.slice(0, -1);
+  return text;
+};
+
+const parseElementNode = (node: HTMLElement) => {
+  switch (node.tagName.toLowerCase()) {
+    case 'br':
       return <br />;
-    case 'CITE':
+    case 'cite':
       return (
         <cite>
           {node.childNodes.length ? parseNodes(node.childNodes) : parseTextNode(node.textContent)}
         </cite>
       );
-    case 'STRONG':
+    case 'strong':
       return (
         <strong>
           {node.childNodes.length ? parseNodes(node.childNodes) : parseTextNode(node.textContent)}
         </strong>
       );
-    case 'EM':
+    case 'em':
       return (
         <em>
           {node.childNodes.length ? parseNodes(node.childNodes) : parseTextNode(node.textContent)}
         </em>
       );
-    case 'A': {
-      const linkNode = node as HTMLLinkElement;
-      if (linkNode.href.endsWith(`#${linkNode.textContent}`)) {
-        return (
-          <NoPropagationLink href={`/tag/${node.textContent}`}>
-            {`#${node.textContent}`}
-          </NoPropagationLink>
-        );
+    case 'a': {
+      const href = node.attributes.getNamedItem('href')?.value!;
+      const text = node.textContent;
+
+      if (href.endsWith(`#${text}`)) {
+        return <NoPropagationLink href={`/tag/${text}`}>{`#${text}`}</NoPropagationLink>;
       }
-      if (linkNode.href.endsWith(`@${linkNode.textContent}`)) {
-        return (
-          <NoPropagationLink href={`/ludzie/${node.textContent}`}>
-            {`@${node.textContent}`}
-          </NoPropagationLink>
-        );
+      if (href.endsWith(`@${text}`)) {
+        return <NoPropagationLink href={`/ludzie/${text}`}>{`@${text}`}</NoPropagationLink>;
       }
-      if (linkNode.href.startsWith('spoiler:')) {
-        return (
-          <Spoiler>{parseSpoilerText(encodeUtf8(linkNode.href.replace('spoiler:', '')))}</Spoiler>
-        );
+      if (href.startsWith('spoiler:')) {
+        return <Spoiler>{parseSpoilerText(encodeUtf8(href.replace('spoiler:', '')))}</Spoiler>;
       }
-      if (linkNode.href.startsWith('http')) {
-        return (
-          <ExternalNoPropagationLink href={linkNode.href}>
-            {linkNode.textContent}
-          </ExternalNoPropagationLink>
-        );
+      if (href.startsWith('http')) {
+        return <ExternalNoPropagationLink href={href}>{text}</ExternalNoPropagationLink>;
       }
       return null;
     }
@@ -103,18 +89,15 @@ const parseElementNode = (node: ChildNode) => {
 const parseNodes = (nodes: NodeListOf<ChildNode>) =>
   Array.from(nodes).map((node, idx) => (
     <Fragment key={idx}>
-      {node.nodeType === node.TEXT_NODE ? parseTextNode(node.textContent) : parseElementNode(node)}
+      {'tagName' in node ? parseElementNode(node as HTMLElement) : parseTextNode(node.textContent)}
     </Fragment>
   ));
 
 export const parseHtml = (text: string) => {
   if (!text) return null;
 
-  if (typeof window !== 'undefined') {
-    const parser = new DOMParser();
-    const parsedText = parser.parseFromString(text, 'text/html');
-    return parseNodes(parsedText.body.childNodes);
-  }
-  const parsedText = parseDocument(text);
-  return parseNodes(parsedText.childNodes as any);
+  const parser = new NodeDOMParser();
+  const parsedText = parser.parseFromString(text, 'text/html');
+
+  return parseNodes(parsedText.body ? parsedText.body.childNodes : parsedText.childNodes);
 };

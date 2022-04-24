@@ -22,7 +22,7 @@ const Home: NextPage = ({ entries }: MikroblogProps) => {
   const category = router.query.category as MikroblogCategory;
 
   const { data, isLoading, error, fetchNextPage, isFetchingNextPage } = useEntries(
-    category,
+    category || MikroblogCategory.HOT,
     entries
   );
 

@@ -11,14 +11,17 @@ interface EntriesListProps {
 
 const EntriesList = ({ entries, isLoading, onInfiniteScroll }: EntriesListProps) => {
   const lastEntryRef = useInfiniteScrolling(isLoading, onInfiniteScroll);
-  const lastEntry = entries?.pop();
 
   return (
     <>
-      {entries?.map((entry) => (
-        <EntryAbstract entry={entry} key={entry.id} listMode />
+      {entries?.map((entry, idx) => (
+        <EntryAbstract
+          entry={entry}
+          key={entry.id}
+          listMode
+          containerRef={idx + 1 === entries.length ? lastEntryRef : undefined}
+        />
       ))}
-      {lastEntry && <EntryAbstract entry={lastEntry} containerRef={lastEntryRef} listMode />}
       {isLoading && <Loading />}
     </>
   );

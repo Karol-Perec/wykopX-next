@@ -3,8 +3,8 @@ import axios from 'axios';
 import { Link } from 'types/link.types';
 
 const getPromotedLinks: QueryFunction<Link[]> = async ({ pageParam = 1 }) => {
-  const response = await axios.get<Link[]>('/api/links/promoted', {
-    params: { page: pageParam },
+  const response = await axios.get<Link[]>('/api/links', {
+    params: { page: pageParam, category: 'promoted' },
   });
   return response.data;
 };

@@ -16,10 +16,7 @@ export async function getEntries(category: string = 'hot', page: number = 1) {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const page = +req.query.page;
   const category = String(req.query.category);
-  // if (!category) {
-  //   res.status(400);
-  //   return;
-  // }
+
   try {
     const links = await getEntries(category, page);
     res.status(200).json(links);

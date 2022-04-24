@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'utils/backend/wykopAxios';
-import { Link, WykopLink, WykopResponse } from 'types';
+import { WykopLink, WykopResponse } from 'types';
 import { mapLink } from 'utils/backend/dataUtils';
 
 export async function getLinks(category: string = 'promoted', page: number = 1) {
@@ -23,6 +23,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const links = await getLinks(category, page);
     res.status(200).json(links);
   } catch (error) {
-    res.status(404).json(error);
+    res.status(403).json(error);
   }
 }
